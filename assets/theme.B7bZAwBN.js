@@ -1,0 +1,1 @@
+import{E as e}from"./index-BomLdrJH.js";function t(t){return e[t]||{name:"话题",color:"#5f636d"}}const n=["#6a5ae0","#1e8cc8","#21a06f","#e07b1e","#d9a406","#e0537e","#d6482f"];function r(e){if(!e)return n[0];let t=0;const r=String(e);for(let n=0;n<r.length;n++)t=31*t+r.charCodeAt(n)>>>0;return n[t%n.length]}export{r as a,t as c};

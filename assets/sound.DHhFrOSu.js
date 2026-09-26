@@ -1,0 +1,1 @@
+import{J as t,ap as s,a5 as a}from"./index-BomLdrJH.js";const n="sx_sound_on";let c=null,o={};function r(){if(null===c)try{c=!0===t(n)}catch(s){c=!1}return c}function i(t){c=!!t;try{a(n,c)}catch(s){}}function u(t){if(r())try{o[t]||(o[t]=s());const a=o[t];a.stop(),a.src="/static/sounds/"+t+".wav",a.play()}catch(a){}}export{i as a,u as p,r as s};

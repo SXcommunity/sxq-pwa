@@ -1,0 +1,240 @@
+﻿/*! 尚贤圈网页版（PWA）· 桌面三栏 + 加载动画 + 安装引导 */
+
+:root{
+  --sxq-red:#d6482f;
+  --sxq-paper:#f7f6f2;
+  --sxq-ink:#2c2c2c;
+  --sxq-mute:#8a8580;
+  --sxq-blue:#4a90d9;
+  --sxq-line:rgba(0,0,0,.08);
+}
+
+/* ---------- 首屏加载（全屏自适应：AI loading 铺满 + hello 手写签名） ---------- */
+.sxq-load{position:fixed;inset:0;z-index:100000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(8px,2vh,24px);background:var(--sxq-paper);transition:opacity .45s ease,visibility .45s ease;padding:4vh 4vw;box-sizing:border-box}
+.sxq-load.sxq-load-hide{opacity:0;visibility:hidden}
+.sxq-load-fx{width:min(62vmin,540px);height:min(62vmin,540px);max-width:92vw;max-height:62vh;-webkit-mask-image:radial-gradient(closest-side,#000 66%,transparent 100%);mask-image:radial-gradient(closest-side,#000 66%,transparent 100%)}
+.sxq-load-hello{width:min(56vw,440px);height:auto;aspect-ratio:500/150;max-height:24vh}
+.sxq-load-txt{font-size:clamp(13px,2vmin,19px);letter-spacing:clamp(4px,1.2vmin,8px);color:var(--sxq-red)}
+
+/* ---------- 桌面左右栏（默认隐藏，≥1024px 显示） ---------- */
+.sxq-side,.sxq-rail{display:none}
+
+.sxq-side{
+  position:fixed;left:0;top:0;bottom:0;width:248px;
+  background:#fff;border-right:1px solid var(--sxq-line);
+  flex-direction:column;padding:18px 14px;gap:12px;overflow-y:auto;z-index:50;
+}
+.sxq-rail{
+  position:fixed;right:0;top:0;bottom:0;width:328px;
+  background:transparent;border-left:1px solid var(--sxq-line);
+  flex-direction:column;padding:18px 16px;gap:14px;overflow-y:auto;z-index:50;
+}
+
+.sxq-brand{display:flex;align-items:center;gap:9px}
+.sxq-brand .seal{width:34px;height:34px;border-radius:9px;background:var(--sxq-red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.sxq-brand b{font-size:16px;color:var(--sxq-ink)}
+.sxq-brand small{display:block;font-size:10px;color:var(--sxq-mute);letter-spacing:2px}
+
+.sxq-side .sxq-lottie[data-lottie="nav"]{width:100%;margin:2px 0}
+.sxq-side-hint{font-size:11px;color:var(--sxq-mute);line-height:1.6;margin:0}
+
+.sxq-publish{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  background:var(--sxq-red);color:#fff;text-decoration:none;
+  border-radius:12px;padding:11px 14px;font-weight:600;font-size:14px;
+  box-shadow:0 8px 20px rgba(214,72,47,.25);
+}
+.sxq-publish:hover{filter:brightness(1.05)}
+
+.sxq-rail .card{background:#fff;border:1px solid var(--sxq-line);border-radius:14px;padding:14px}
+.sxq-rail h5{margin:0 0 10px;font-size:13px;color:var(--sxq-ink);display:flex;align-items:center;gap:6px}
+.sxq-rail h5::before{content:'';width:3px;height:13px;border-radius:2px;background:var(--sxq-red)}
+.sxq-rail ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.sxq-rail li a{color:var(--sxq-ink);text-decoration:none;font-size:13px;line-height:1.5;display:block}
+.sxq-rail li a:hover{color:var(--sxq-red)}
+.sxq-rail .muted{color:var(--sxq-mute);font-size:12px}
+.sxq-rail .quick{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sxq-rail .quick a{display:block;text-align:center;padding:10px 6px;border-radius:11px;border:1px solid var(--sxq-line);background:#fff;color:var(--sxq-ink);text-decoration:none;font-size:12.5px}
+.sxq-rail .quick a:hover{border-color:rgba(214,72,47,.45);color:var(--sxq-red)}
+.sxq-rail .rail-hello{display:block;width:100%;max-width:220px;height:auto;aspect-ratio:500/150;margin-bottom:2px}
+
+/* ≥1024px：左侧导航 + 内容（两栏） */
+@media (min-width:1024px){
+  /* 关键：uni-app H5 默认给 html/body 设了 max-width:640px 并居中（手机宽度上限）。
+     若不解除，叠加左右内边距后内容会被挤成 ~84px 的窄条。 */
+  html, body {
+    max-width: none !important;
+    width: auto !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  body {
+    padding-left: 248px !important;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  /* 解除 uni-app 各层容器的宽度上限 */
+  uni-app, uni-page, uni-page-wrapper, uni-page-body, .uni-app, .uni-page, .uni-page-wrapper, .uni-page-body {
+    max-width: none !important;
+    width: auto !important;
+  }
+  #app { max-width: 920px !important; margin: 0 auto !important; }
+  .uni-tabbar { display: none !important; }
+  .sxq-side { display: flex; }
+
+  /* ── 顶部标题条遮挡修复 ──
+     构建产物里 .uni-page-head 是 position:fixed + height:44px，而页面主体
+     没有等高的占位元素，导致「我的」等页面的内容顶到标题条下面被一条白条盖住。
+     这里把它改为随内容排布（static），标题条正常占据高度，从根上不可能再遮挡。 */
+  .uni-page-head, uni-page-head {
+    position: static !important;
+    top: auto !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-bottom: none !important;
+    color: var(--sxq-ink) !important;
+    padding-top: 16px !important;
+  }
+  /* static 后不再需要占位块 */
+  .uni-page-head ~ .uni-placeholder { display: none !important; }
+  /* 兜底：即使其它原因残留了 44px 顶部内边距，也不让它顶出空隙 */
+  .uni-page-wrapper, uni-page-wrapper { padding-top: 0 !important; }
+}
+
+/* ≥1280px：再加右侧信息栏（三栏） */
+@media (min-width:1280px){
+  body { padding-right: 328px !important; }
+  .sxq-rail { display: flex; }
+}
+
+/* ---------- 安装引导 ---------- */
+.sxq-install{
+  position:fixed;left:50%;bottom:18px;transform:translateX(-50%);
+  z-index:99999;max-width:min(560px,92vw);
+  display:none;align-items:center;gap:12px;
+  background:#fff;border:1px solid var(--sxq-line);border-radius:14px;
+  box-shadow:0 18px 44px rgba(30,20,15,.2);padding:12px 14px;
+}
+.sxq-install.show{display:flex}
+.sxq-install-txt{font-size:13px;color:var(--sxq-ink);line-height:1.55}
+.sxq-install-txt b{color:var(--sxq-red)}
+.sxq-install-btn{border:none;border-radius:10px;padding:8px 14px;background:var(--sxq-red);color:#fff;cursor:pointer;font-size:13px;white-space:nowrap}
+.sxq-install-close{border:none;background:transparent;color:var(--sxq-mute);font-size:18px;cursor:pointer;line-height:1}
+
+/* 手机端：左右栏已隐藏，AI 客服与加载动画照常 */
+@media (max-width:768px){
+  .sxq-load-fx{width:min(78vw,420px);height:min(78vw,420px);-webkit-mask-image:radial-gradient(closest-side,#000 66%,transparent 100%);mask-image:radial-gradient(closest-side,#000 66%,transparent 100%)}
+  .sxq-load-hello{width:min(74vw,320px)}
+}
+
+/* ══════════════════════════════════════════════════════════════
+   本轮新增（2026-09-25）
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── ① PC：隐藏手机式的「<」返回箭头（那是手机习惯，PC 上既没用又占位） ── */
+body.sxq-desktop .uni-page-head-hd,
+body.sxq-desktop .uni-page-head .uni-page-head-btn,
+body.sxq-desktop uni-page-head .uni-page-head-hd,
+body.sxq-desktop .uni-page-head .uni-page-head-bd > .uni-page-head-btn {
+  display: none !important;
+}
+/* PC 上标题居中（没有返回箭头后，左对齐会显得空） */
+body.sxq-desktop .uni-page-head .uni-page-head-bd { width: 100% !important; }
+
+/* ── ② PC：内容限宽居中，阅读宽度 760px（大屏上不再被拉得过宽） ── */
+@media (min-width:1024px){
+  #app { max-width: 760px !important; }
+}
+
+/* ── ③ 左侧导航：内联 SVG 图标 + 可折叠（状态记忆） ── */
+.sxq-menu{display:flex;flex-direction:column;gap:2px;margin-top:4px}
+.sxq-menu a{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:11px;
+  color:var(--sxq-ink);text-decoration:none;font-size:14px;
+  transition:background .16s ease,color .16s ease;
+}
+.sxq-menu a:hover{background:rgba(214,72,47,.07);color:var(--sxq-red)}
+.sxq-menu a.on{background:var(--sxq-ink);color:#fff}
+.sxq-ic{display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.sxq-side .sxq-publish .sxq-ic{color:#fff}
+
+.sxq-collapse{
+  position:absolute;right:8px;top:20px;width:26px;height:26px;border-radius:8px;
+  border:1px solid var(--sxq-line);background:#fff;color:var(--sxq-mute);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .16s ease;
+}
+.sxq-collapse:hover{color:var(--sxq-red);border-color:rgba(214,72,47,.45)}
+
+.sxq-side.collapsed{width:76px;padding-left:10px;padding-right:10px;align-items:center}
+.sxq-side.collapsed .sxq-lb,
+.sxq-side.collapsed .sxq-brand-t{display:none}
+.sxq-side.collapsed .sxq-menu{width:100%}
+.sxq-side.collapsed .sxq-menu a,
+.sxq-side.collapsed .sxq-publish{justify-content:center;padding-left:0;padding-right:0;width:100%}
+.sxq-side.collapsed .sxq-collapse svg{transform:rotate(180deg)}
+@media (min-width:1024px){
+  body.sxq-side-collapsed{padding-left:76px !important}
+}
+
+/* ── ④ 安装引导：双按钮布局 ── */
+.sxq-install-acts{display:flex;gap:8px;flex:0 0 auto}
+.sxq-install-later{
+  border:1px solid var(--sxq-line);border-radius:10px;padding:8px 12px;background:#fff;
+  color:var(--sxq-mute);cursor:pointer;font-size:13px;white-space:nowrap;
+}
+.sxq-install-later:hover{color:var(--sxq-red);border-color:rgba(214,72,47,.4)}
+
+/* ── ⑤ 右下角两个圆形按钮错开排列（客服浮窗抬高，不再互相压住） ── */
+body .sxq-ai{--sxq-ai-bottom:calc(86px + env(safe-area-inset-bottom, 0px)) !important}
+@media (max-width:859px){
+  body .sxq-ai{--sxq-ai-bottom:calc(98px + env(safe-area-inset-bottom, 0px)) !important}
+}
+body.sxq-desktop .sxq-ai{--sxq-ai-bottom:calc(28px + var(--sxq-kb, 0px)) !important;
+  --sxq-ai-right:calc(348px + 16px) !important}
+
+/* ── ⑥ iOS：动态视口高度 + 安全区 + 键盘不遮输入框 ── */
+@supports (height: 100dvh){
+  body.sxq-ios{min-height:100dvh}
+}
+body.sxq-ios{
+  padding-bottom:env(safe-area-inset-bottom, 0px) !important;
+  /* 键盘弹起时把可视高度写进来，底部元素随之上推 */
+  --sxq-vvh:100vh;
+}
+body.sxq-ios .uni-tabbar{padding-bottom:env(safe-area-inset-bottom, 0px) !important}
+body.sxq-ios uni-page-body{padding-bottom:calc(var(--sxq-kb, 0px))}
+.sxq-side{padding-top:calc(18px + env(safe-area-inset-top, 0px)) !important}
+.sxq-rail{padding-bottom:calc(18px + env(safe-area-inset-bottom, 0px)) !important}
+
+/* ── ⑦ 首次使用四步轻引导（只弹一次，仅 PC ≥1024px） ── */
+.sxq-tour{
+  position:fixed;right:348px;bottom:28px;z-index:99998;width:min(320px,86vw);
+  background:#fff;border:1px solid var(--sxq-line);border-radius:16px;padding:18px;
+  box-shadow:0 18px 46px rgba(30,20,15,.18);
+  opacity:0;visibility:hidden;transform:translateY(12px);
+  transition:opacity .32s cubic-bezier(.22,.8,.24,1),transform .32s cubic-bezier(.22,.8,.24,1),visibility .32s;
+}
+.sxq-tour.show{opacity:1;visibility:visible;transform:none}
+.sxq-tour-n{font-size:11px;letter-spacing:.16em;color:var(--sxq-red);font-weight:700;margin-bottom:6px}
+.sxq-tour b{display:block;font-size:15px;color:var(--sxq-ink);margin-bottom:6px}
+.sxq-tour p{font-size:13px;color:var(--sxq-mute);line-height:1.75;margin:0}
+.sxq-tour kbd{
+  font-family:ui-monospace,Consolas,monospace;font-size:11.5px;background:var(--sxq-paper);
+  border:1px solid var(--sxq-line);border-radius:5px;padding:1px 5px;
+}
+.sxq-tour-acts{display:flex;gap:8px;margin-top:14px;justify-content:flex-end;align-items:center}
+.sxq-tour-skip{border:none;background:none;color:var(--sxq-mute);font-size:13px;cursor:pointer}
+.sxq-tour-next{border:none;background:var(--sxq-red);color:#fff;border-radius:10px;padding:8px 16px;font-size:13px;cursor:pointer}
+@media (max-width:1279px){ .sxq-tour{right:20px} }
+@media (max-width:1023px){ .sxq-tour{display:none !important} }
+
+/* ── ⑧ 在线 / 离线状态提示条 ── */
+.sxq-net{
+  position:fixed;left:50%;top:14px;transform:translate(-50%,-14px);z-index:99999;
+  background:var(--sxq-ink);color:#fff;font-size:12.5px;padding:8px 18px;border-radius:99px;
+  box-shadow:0 10px 26px rgba(30,20,15,.2);
+  opacity:0;visibility:hidden;transition:opacity .3s ease,transform .3s cubic-bezier(.22,.8,.24,1),visibility .3s;
+  max-width:88vw;text-align:center;
+}
+.sxq-net.show{opacity:1;visibility:visible;transform:translate(-50%,0)}
+.sxq-net.off{background:#8a6a1f}
